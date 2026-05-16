@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import campaigns, jobs
+from ..routers import project_routes
 from .services.worker_service import start_workers
 
 app = FastAPI(
@@ -21,6 +22,7 @@ app.add_middleware(
 # Routers
 app.include_router(campaigns.router)
 app.include_router(jobs.router)
+app.include_router(project_routes.router)
 
 
 @app.on_event("startup")
