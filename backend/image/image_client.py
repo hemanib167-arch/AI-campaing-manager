@@ -1,58 +1,51 @@
 import os
-import json
+import base64
 import asyncio
 from ..utils.errors import AIProviderError
 
 async def generate_image(prompt: str, size: str = "1024x1024") -> str:
     """
-    Generates images using Google Gemini Imagen (stable fallback).
+    Generates images using Gemini 3.1 Flash Image Preview multimodal model.
     """
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    if not gemini_key:
+    api_key = os.getenv("GEMINI_API_KEY")
+    model_id = os.getenv("GEMINI_MODEL_NAME", "gemini-3.1-flash-image-preview")
+    
+    if not api_key:
         return "https://placehold.co/1024x1024/1A1AAF/FFFFFF?text=No+API+Key"
 
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=gemini_key)
+        from google import genai
+        from google.genai import types
+
+        client = genai.Client(api_key=api_key)
+        loop = asyncio.get_event_loop()
         
-        # We try to use the Imagen model if available in the SDK
-        # For many AI Studio accounts, Imagen 3 is accessible via 'imagen-3'
-        try:
-            # Note: The SDK method for image generation varies by version.
-            # In latest versions, it's often via the ImageGenerationModel (Vertex) 
-            # or a specific method in genai.
-            
-            # Since we are in a hackathon, we will use a robust fallback to a 
-            # high-quality search/placeholder if the specific image API is restricted.
-            
-            # However, let's try one more REST approach with the correct v1 endpoint
-            import httpx
-            url = f"https://generativelanguage.googleapis.com/v1/models/imagen-3:predict?key={gemini_key}"
-            
-            # Standard Vertex/AI-Studio Imagen 3 payload
-            payload = {
-                "instances": [{"prompt": prompt}],
-                "parameters": {"sampleCount": 1}
-            }
-            
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.post(url, json=payload)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    if "predictions" in data and len(data["predictions"]) > 0:
-                        # Imagen returns base64 in 'bytesBase64Encoded'
-                        b64 = data["predictions"][0].get("bytesBase64Encoded")
-                        if b64:
-                            return f"data:image/png;base64,{b64}"
+        # Ensure prompt is clean
+        clean_prompt = f"Generate a high-resolution professional marketing image for IndiGo Airlines: {prompt}"
 
-        except Exception as sdk_err:
-            print(f"SDK Image Error: {sdk_err}")
+        def _call_gemini():
+            return client.models.generate_content(
+                model=model_id,
+                contents=clean_prompt,
+                config=types.GenerateContentConfig(
+                    response_modalities=['IMAGE'],
+                )
+            )
 
-        # If all else fails, return a branded placeholder that looks good for the demo
-        # We use a dynamic placeholder that includes the prompt keywords to look "real"
-        keywords = "+".join(prompt.split()[:5])
-        return f"https://placehold.co/1024x1024/1A1AAF/FFFFFF?text=AI+Generated:+{keywords}"
+        response = await loop.run_in_executor(None, _call_gemini)
+        
+        for part in response.parts:
+            # The SDK returns image bytes in inline_data
+            if part.inline_data:
+                img_bytes = part.inline_data.data
+                b64 = base64.b64encode(img_bytes).decode('utf-8')
+                mime = part.inline_data.mime_type or "image/png"
+                return f"data:{mime};base64,{b64}"
+            
+        return "https://placehold.co/1024x1024/1A1AAF/FFFFFF?text=Image+Not+Found+In+Response"
 
     except Exception as e:
-        print(f"Global Image Error: {e}")
-        return "https://placehold.co/1024x1024/1A1AAF/FFFFFF?text=6E+Creative+Studio"
+        print(f"Gemini 3.1 Image Error: {e}")
+        # Return the prompt-based placeholder as a last resort
+        keywords = "+".join(prompt.split()[:5])
+        return f"https://placehold.co/1024x1024/1A1AAF/FFFFFF?text=AI+Generated:+{keywords}"

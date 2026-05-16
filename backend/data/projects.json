@@ -8,5 +8,15 @@
     "name": "testtt1",
     "description": "heckathon",
     "id": "proj_ac1b5085-3f73-43f5-9488-e626a63a40f4"
+  },
+  "proj_981249ac-5182-41b1-b5a7-308cc34607c8": {
+    "name": "Diwali season",
+    "description": "I want to create campaign for indigo diwali discount\n",
+    "id": "proj_981249ac-5182-41b1-b5a7-308cc34607c8"
+  },
+  "proj_46f5110a-8b7a-4d41-b2ec-859b863bc4ae": {
+    "name": "diwali indigo",
+    "description": "Diwali indigi fest\n",
+    "id": "proj_46f5110a-8b7a-4d41-b2ec-859b863bc4ae"
   }
 }

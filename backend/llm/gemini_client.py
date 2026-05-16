@@ -4,25 +4,38 @@ from typing import Dict, Any
 from ..utils.errors import AIProviderError
 
 async def generate_text(system_prompt: str, user_prompt: str) -> Dict[str, Any]:
-    """Gemini fallback using google-generativeai SDK."""
+    """Gemini fallback using new google-genai SDK."""
     api_key = os.getenv("GEMINI_API_KEY")
-    model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
+    model_id = os.getenv("GEMINI_MODEL_NAME", "gemini-3.1-flash-image-preview")
+    
     if not api_key:
         raise AIProviderError("GEMINI_API_KEY not set.")
 
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=api_key)
+        from google import genai
+        from google.genai import types
+        import asyncio
 
-        model = genai.GenerativeModel(model_name)
-
+        client = genai.Client(api_key=api_key)
+        
         full_prompt = (
-            f"SYSTEM: {system_prompt}\n\n"
-            f"USER: {user_prompt}\n\n"
-            "Respond ONLY with valid JSON."
+            f"SYSTEM INSTRUCTIONS: {system_prompt}\n\n"
+            f"USER REQUEST: {user_prompt}\n\n"
+            "IMPORTANT: Return ONLY valid JSON."
         )
 
-        response = model.generate_content(full_prompt)
+        loop = asyncio.get_event_loop()
+        
+        def _call_gemini():
+            return client.models.generate_content(
+                model=model_id,
+                contents=full_prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type='application/json',
+                )
+            )
+
+        response = await loop.run_in_executor(None, _call_gemini)
         text = response.text.strip()
 
         # Extract JSON
@@ -33,4 +46,4 @@ async def generate_text(system_prompt: str, user_prompt: str) -> Dict[str, Any]:
 
         return json.loads(text)
     except Exception as e:
-        raise AIProviderError(f"Gemini Error ({model_name}): {str(e)}")
+        raise AIProviderError(f"Gemini (google-genai) failed: {str(e)}")
