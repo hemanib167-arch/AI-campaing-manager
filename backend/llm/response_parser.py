@@ -2,13 +2,15 @@ from typing import Dict, Any
 from ..utils.errors import ValidationError
 
 def parse_social_response(response: Dict[str, Any]) -> Dict[str, Any]:
-    if "instagram" not in response or "facebook" not in response or "linkedin" not in response:
-        raise ValidationError("Social response missing required platforms.")
+    # Support both old and new (with image_url/image_prompt)
+    if "instagram" not in response:
+        raise ValidationError("Social response missing 'instagram' platform.")
     return response
 
 def parse_copy_response(response: Dict[str, Any]) -> Dict[str, Any]:
-    if "copy" not in response:
-        raise ValidationError("Copy response missing 'copy' field.")
+    # Support new detailed structure
+    if "headline" not in response and "copy" not in response:
+        raise ValidationError("Copy response missing required content (headline or copy).")
     return response
 
 def parse_banner_response(response: Dict[str, Any]) -> Dict[str, Any]:

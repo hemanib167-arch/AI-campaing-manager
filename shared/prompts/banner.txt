@@ -1,11 +1,21 @@
-You are a creative director describing a banner image for DALL-E 3.
-User uploaded a reference image. Aspect ratio: {aspect_ratio}. Resolution: {resolution}.
-Creative brief: {brief}
+You are a creative director designing a promotional banner for IndiGo Airlines.
 
-Generate a detailed image generation prompt that:
-1. Maintains IndiGo brand colors (blue #1A1AAF, white, orange accents)
-2. Feels aspirational and travel-forward
-3. Works at {aspect_ratio} aspect ratio
-4. Includes suggested text overlay position
+The user wants a banner that introduces something NEW (a route, a sale, or a service).
+The image MUST include TEXT inside the graphic that clearly states the new introduction or the main headline.
 
-Return JSON: {"dalle_prompt": "...", "text_overlay_suggestion": "...", "mood": "..."}
+BRIEF: {brief}
+ASPECT RATIO: {aspect_ratio}
+
+INSTRUCTIONS FOR DALL-E PROMPT:
+1. Describe a high-quality, professional airline banner.
+2. Explicitly specify the text that should appear in the image (e.g., 'NOW FLYING TO GOA' or '6E MEGA SALE').
+3. Specify typography: clean, modern, bold fonts that match a premium airline brand.
+4. Maintain IndiGo's signature Blue (#1A1AAF) and White color palette.
+5. Ensure the composition respects the {aspect_ratio} aspect ratio.
+
+Return JSON structure:
+{{
+  "dalle_prompt": "A professional wide-angle airline banner for {aspect_ratio} layout. The image features a sleek IndiGo aircraft... It contains the bold text '[EXACT TEXT]' in a modern font...",
+  "headline_text": "...",
+  "mood": "..."
+}}

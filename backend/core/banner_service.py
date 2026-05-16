@@ -17,11 +17,20 @@ class BannerService:
         # 1. Generate text brief via LLM
         llm_response = await generate_with_fallback(system_prompt, user_prompt)
         check_response_guardrails(llm_response)
-        parsed_response = parse_banner_response(llm_response)
+        parsed_response = llm_response # Assuming response is already JSON
         
-        # 2. Generate image using DALL-E 3
-        dalle_prompt = parsed_response["dalle_prompt"]
-        image_url = await generate_image(dalle_prompt)
+        # 2. Map aspect ratio to DALL-E 3 sizes
+        ar = payload.get("aspect_ratio", "1:1")
+        size_map = {
+            "16:9": "1792x1024",
+            "9:16": "1024x1792",
+            "1:1": "1024x1024"
+        }
+        dalle_size = size_map.get(ar, "1024x1024")
+        
+        # 3. Generate image using DALL-E 3
+        dalle_prompt = parsed_response.get("dalle_prompt", payload.get("brief"))
+        image_url = await generate_image(dalle_prompt, size=dalle_size)
         
         parsed_response["image_url"] = image_url
         return parsed_response

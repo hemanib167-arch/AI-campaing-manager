@@ -1,11 +1,25 @@
-Given the campaign details below, generate social media post copy for ALL three platforms simultaneously.
+Given the campaign details below, generate social media post copy AND visual image descriptions for ALL three platforms. 
+
+Each platform should have a UNIQUE tone and a UNIQUE image concept tailored to its audience.
 
 Campaign type: {campaign_type}
 Campaign description: {description}
 
-Return JSON:
-{
-  "instagram": {"caption": "...", "hashtags": ["...", "..."]},
-  "facebook":  {"caption": "...", "hashtags": ["...", "..."]},
-  "linkedin":  {"caption": "...", "hashtags": ["...", "..."]}
-}
+Return JSON with this EXACT structure:
+{{
+  "instagram": {{
+    "caption": "...", 
+    "hashtags": ["...", "..."],
+    "image_prompt": "A high-quality, vibrant visual for Instagram showing..."
+  }},
+  "facebook":  {{
+    "caption": "...", 
+    "hashtags": ["...", "..."],
+    "image_prompt": "A warm, community-focused visual for Facebook showing..."
+  }},
+  "linkedin":  {{
+    "caption": "...", 
+    "hashtags": ["...", "..."],
+    "image_prompt": "A professional, sleek corporate visual for LinkedIn showing..."
+  }}
+}}

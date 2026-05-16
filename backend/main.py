@@ -1,5 +1,14 @@
 import sys
 import os
+from pathlib import Path
+
+# Load .env from the backend directory
+try:
+    from dotenv import load_dotenv
+    _env_path = Path(__file__).parent / ".env"
+    load_dotenv(_env_path)
+except ImportError:
+    pass  # python-dotenv not installed, rely on system env vars
 
 # Add the parent directory to sys.path if running as a script
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
