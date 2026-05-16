@@ -5,7 +5,7 @@ from ..queue.job_queue import add_to_queue
 from ..utils.id_generator import generate_id
 from ..storage.memory_store import jobs_db
 
-router = APIRouter(prefix="/copywriting", tags=["Copywriting"])
+router = APIRouter(prefix="/copy", tags=["Copywriting"])
 
 @router.post("/", response_model=JobSchema)
 async def create_copywriting(request: CopywritingRequest):

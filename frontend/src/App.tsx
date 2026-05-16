@@ -7,8 +7,9 @@ import { BannerTab } from './components/BannerTab';
 import { ImageEditTab } from './components/ImageEditTab';
 import { ResultPanel } from './components/ResultPanel';
 import { useStore } from './store/useStore';
+import { LandingPage } from './pages/LandingPage';
 
-const App = () => {
+const Workspace = ({ onBack }: { onBack: () => void }) => {
   const [activeTab, setActiveTab] = useState<TabType>('social');
   const [campaignType, setCampaignType] = useState('sale');
   const [description, setDescription] = useState('');
@@ -39,11 +40,17 @@ const App = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="px-6 py-4">
+        <div className="px-6 py-4" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div className="flex items-center gap-3">
             <Plane size={32} color="#1A1AAF" />
             <h1 className="text-2xl font-bold text-indigo-blue">6E Creative Studio</h1>
           </div>
+          <button
+            onClick={onBack}
+            style={{ fontSize: '0.85rem', color: '#6b7280', cursor: 'pointer', background: 'none', border: 'none', fontWeight: 500 }}
+          >
+            ← Back to Projects
+          </button>
         </div>
       </header>
 
@@ -121,6 +128,16 @@ const App = () => {
       </div>
     </div>
   );
+};
+
+const App = () => {
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+
+  if (!selectedProjectId) {
+    return <LandingPage onProjectSelect={(id) => setSelectedProjectId(id)} />;
+  }
+
+  return <Workspace onBack={() => setSelectedProjectId(null)} />;
 };
 
 export default App;
