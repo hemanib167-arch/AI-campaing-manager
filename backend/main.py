@@ -7,6 +7,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import social_routes, copywriting_routes, banner_routes, job_routes
+from .routers import project_routes, campaign_routes, asset_routes, analytics_routes, health_routes
+from .middleware.logging_middleware import logging_middleware
+from .middleware.error_middleware import error_middleware
+from .middleware.auth_middleware import auth_middleware
 from .queue.job_manager import start_workers
 
 app = FastAPI(
@@ -23,10 +27,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_logging(request, call_next):
+    return await logging_middleware(request, call_next)
+
+@app.middleware("http")
+async def handle_errors(request, call_next):
+    return await error_middleware(request, call_next)
+
+@app.middleware("http")
+async def check_auth(request, call_next):
+    return await auth_middleware(request, call_next)
+
 app.include_router(social_routes.router, prefix="/api/campaigns")
 app.include_router(copywriting_routes.router, prefix="/api/campaigns")
 app.include_router(banner_routes.router, prefix="/api/campaigns")
 app.include_router(job_routes.router, prefix="/api")
+app.include_router(project_routes.router, prefix="/api")
+app.include_router(campaign_routes.router, prefix="/api")
+app.include_router(asset_routes.router, prefix="/api")
+app.include_router(analytics_routes.router, prefix="/api")
+app.include_router(health_routes.router, prefix="/api")
 
 @app.on_event("startup")
 async def startup_event():
