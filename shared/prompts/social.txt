@@ -1,0 +1,11 @@
+Given the campaign details below, generate social media post copy for ALL three platforms simultaneously.
+
+Campaign type: {campaign_type}
+Campaign description: {description}
+
+Return JSON:
+{
+  "instagram": {"caption": "...", "hashtags": ["...", "..."]},
+  "facebook":  {"caption": "...", "hashtags": ["...", "..."]},
+  "linkedin":  {"caption": "...", "hashtags": ["...", "..."]}
+}
