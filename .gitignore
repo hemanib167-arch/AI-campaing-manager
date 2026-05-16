@@ -1,0 +1,16 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+backend/assets/generated_images/*
+backend/assets/generated_banners/*
+backend/assets/edited_images/*
+backend/assets/uploaded_references/*
+
+!backend/assets/generated_images/.gitkeep
+!backend/assets/generated_banners/.gitkeep
+!backend/assets/edited_images/.gitkeep
+!backend/assets/uploaded_references/.gitkeep
